@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "830690842317",
+    "project_id": "quickdrawwithmicrobit",
+    "storage_bucket": "quickdrawwithmicrobit.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:830690842317:android:3b05c58ad2675a7dd03b84",
+        "android_client_info": {
+          "package_name": "com.example.ubicompproj"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQ0dNaHDSXCE2mXNRGqXseaTyGPTR_Vjw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
