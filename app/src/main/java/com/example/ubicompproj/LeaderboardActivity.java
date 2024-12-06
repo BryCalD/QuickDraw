@@ -33,7 +33,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         leaderboardListView = findViewById(R.id.leaderboardListView);
 
         // Initialize Firebase Database reference
-        mDatabase = FirebaseDatabase.getInstance("https://quickdrawwithmicrobit-default-rtdb.europe-west1.firebasedatabase.app/").getReference("users");
+        mDatabase = FirebaseDatabase.getInstance("https://micro-quickdraw-default-rtdb.europe-west1.firebasedatabase.app").getReference("users");
 
         // Initialize data list
         leaderboardData = new ArrayList<>();

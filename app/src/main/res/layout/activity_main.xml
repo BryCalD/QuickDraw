@@ -23,38 +23,41 @@
         <!-- Game Title -->
         <TextView
             android:id="@+id/gameTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="422dp"
             android:layout_height="wrap_content"
-            android:text="QuickDraw Reaction Game"
-            android:textSize="36sp"
-            android:textColor="#333333"
-            android:textStyle="bold"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/ewert"
             android:gravity="center"
-            android:layout_marginTop="20dp" />
+            android:text="Quickdraw"
+            android:textColor="#000000"
+            android:textSize="54sp"
+            android:textStyle="bold" />
 
         <!-- Countdown Text -->
         <TextView
             android:id="@+id/countdownText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Countdown will appear here"
-            android:textSize="32sp"
-            android:textColor="#333333"
-            android:textStyle="bold"
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/rye"
             android:gravity="center"
-            android:layout_marginTop="40dp" />
+            android:text="Stow yer six-shooter till it turns, be quick or kick the bucket."
+            android:textColor="#333333"
+            android:textSize="24sp"
+            android:textStyle="normal" />
 
         <!-- Result Text -->
         <TextView
             android:id="@+id/resultText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=""
-            android:textSize="24sp"
-            android:textColor="#FF0000"
-            android:textStyle="bold"
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/ewert"
             android:gravity="center"
-            android:layout_marginTop="40dp" />
+            android:text=""
+            android:textColor="#000000"
+            android:textSize="34sp"
+            android:textStyle="bold" />
 
         <!-- Bottom buttons in a horizontal layout -->
         <LinearLayout
@@ -69,24 +72,26 @@
                 android:id="@+id/startButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
                 android:layout_weight="1"
-                android:text="Start Game"
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
                 android:background="@drawable/button_bg"
-                android:layout_marginEnd="16dp" />
+                android:fontFamily="@font/rye"
+                android:text="Start Game"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
 
             <!-- View Leaderboard Button -->
             <Button
                 android:id="@+id/leaderboardButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="View Leaderboard"
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
                 android:background="@drawable/button_bg"
-                android:layout_marginStart="16dp" />
+                android:fontFamily="@font/rye"
+                android:text="Leaderboard"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

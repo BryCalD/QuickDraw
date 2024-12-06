@@ -29,7 +29,6 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements com.example.ubicompproj.BLEListener {
 
-    com.example.ubicompproj.GraphView graphView;
     TextView countdownTV;
     TextView resultTV;
     com.example.ubicompproj.BLEService service;
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
             Manifest.permission.BLUETOOTH_ADVERTISE,
             Manifest.permission.ACCESS_FINE_LOCATION,
     };
-
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
@@ -69,23 +67,22 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize Firebase Database reference
-        mDatabase = FirebaseDatabase.getInstance("https://quickdrawwithmicrobit-default-rtdb.europe-west1.firebasedatabase.app/").getReference();
+        //firebase link!
+        mDatabase = FirebaseDatabase.getInstance("https://micro-quickdraw-default-rtdb.europe-west1.firebasedatabase.app").getReference();
         countdownTV = findViewById(R.id.countdownText);
         resultTV = findViewById(R.id.resultText);
 
         Button startButton = findViewById(R.id.startButton);
         Button leaderboardButton = findViewById(R.id.leaderboardButton);
 
-        // Request permissions if not granted
+        //if permissions arent set up, request
         if (!hasPermissions(this, PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
 
-        // Start Game button
+        //start game button
         startButton.setOnClickListener(v -> startGame());
-
-        // Navigate to Leaderboard button
+        //leaderboard button
         leaderboardButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, LeaderboardActivity.class);
             startActivity(intent);
@@ -95,117 +92,106 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
     @Override
     protected void onStart() {
         super.onStart();
-        // Binds to Bluetooth when activity starts
+        //binds bluetooth when activity starts
         Intent intent = new Intent(this, com.example.ubicompproj.BLEService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        //background music
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(this, R.raw.cowboy_standoff); // Replace with your file name
+            mediaPlayer.start();
+        }
     }
 
     private void startGame() {
-        // Get the root layout (background view)
+        //root layouts
         View backgroundView = findViewById(R.id.main_background);
         Button startButton = findViewById(R.id.startButton);
         Button leaderboardButton = findViewById(R.id.leaderboardButton);
 
-        if (!isGameRunning) {
-            isGameRunning = true;
-            resultTV.setText("");
-            gameStartTime = 0;
+        if (!isGameRunning) {       //sets the game to running if its not
+            isGameRunning = true;   //already so no multiple instance play
+            resultTV.setText("");   //clear previous score when new game is made
+            gameStartTime = 0;      //reset the game start time
 
-            // Hide countdown text
+            //hides elements when game starts
             countdownTV.setVisibility(View.INVISIBLE);
-
-            // Hide the Start Game and Leaderboard buttons when the game starts
             startButton.setVisibility(View.INVISIBLE);
             leaderboardButton.setVisibility(View.INVISIBLE);
 
-            // Change background color to red when the game starts
+            //change to red when game starts
             backgroundView.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_light));
 
-            // Play background music when the game starts
-            if (mediaPlayer == null) {
-                mediaPlayer = MediaPlayer.create(this, R.raw.cowboy_standoff); // Replace with your file name
-                mediaPlayer.setLooping(true); // Loop the music
-                mediaPlayer.start();
-            }
-
-            // Generate a random countdown between 2 and 5 seconds
+            //make random countdown between 2 and 5 seconds
             Random random = new Random();
             countdownDuration = 2000 + random.nextInt(3000);
 
             new CountDownTimer(countdownDuration, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    countdownTV.setText("Starting in: " + (millisUntilFinished / 1000));
                 }
 
                 @Override
                 public void onFinish() {
-                    // Stop the current music
-                    if (mediaPlayer != null) {
-                        mediaPlayer.stop();
-                        mediaPlayer.release();
-                        mediaPlayer = null;
-                    }
-
-                    // Play a different music after the countdown finishes
+                    //change to green when countdown finishes and play its high noon! when countdown finishes
+                    countdownTV.setText("Go!");
+                    gameStartTime = System.currentTimeMillis();
+                    backgroundView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, android.R.color.holo_green_light));
                     mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.its_high_noon); // Replace with the new file name
                     mediaPlayer.start();
 
-                    // Change background color to green when countdown ends
-                    backgroundView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, android.R.color.holo_green_light));
-                    countdownTV.setText("Go!");
-                    gameStartTime = System.currentTimeMillis();
-
-                    // Show the Start Game and Leaderboard buttons again after the game starts
+                    //show the Start Game and Leaderboard buttons again after the game starts
                     startButton.setVisibility(View.VISIBLE);
                     leaderboardButton.setVisibility(View.VISIBLE);
                 }
             }.start();
         }
     }
-
-
+    //data is recieved from the microbit and processed into the mechanics here
     @Override
     public void dataReceived(float xG, float yG, float zG, float pitch, float roll) {
+        //if it detects sufficient y (up and down) movement it does the following:
         if (yG > 2000) {
-            // Play a sound when the condition is met
-            if (mediaPlayer == null) {
-                mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.revolver); // Replace with your sound file
-            }
-            mediaPlayer.start(); // Play the sound
+            //on a thread  to make the first instance of the program work
+            runOnUiThread(() -> {
+                                                                    //1. If before the game starts score
+                if (isGameRunning && gameStartTime == 0) {          //   is invalid and forces restart
+                    isGameRunning = false;                          //2. If game is started, counts the
+                    resultTV.setText("Too Early!!! Try again...."); //   score and gives result
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.revolver); // Replace with the new file name
+                    mediaPlayer.start();
+                } else if (isGameRunning) {
+                    isGameRunning = false;
+                    //point logic
+                    shakeTime = System.currentTimeMillis();
+                    score = shakeTime - gameStartTime;
 
-            if (isGameRunning && gameStartTime == 0) {
-                isGameRunning = false;
-                resultTV.setText("Too Early!!! Try again....");
-            } else if (isGameRunning) {
-                isGameRunning = false;
-                shakeTime = System.currentTimeMillis();
-                score = shakeTime - gameStartTime;
-
-                resultTV.setText("Win! Your score: " + score + " ms");
-                showUsername(score);
-            }
+                    // Play a sound when the condition is met and show points
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.revolver); // Replace with the new file name
+                    mediaPlayer.start();
+                    resultTV.setText("Ya wrangled up " + score + " points!");
+                    showUsername(score);
+                }
+            });
         }
-        graphView.updateGraph(new float[]{xG, yG, zG}, false, true, false, false);
     }
 
-
+    //popup to enter username
     private void showUsername(long score) {
+        //run on main thread
         runOnUiThread(() -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Enter Your Username");
+            builder.setTitle("Your Score: " + score + " Enter Your Username");
 
-            // Input field
+            //input field
             final EditText input = new EditText(MainActivity.this);
             input.setHint("Username");
             builder.setView(input);
 
-            // Dialog buttons
+            //buttons
             builder.setPositiveButton("OK", (dialog, which) -> {
                 String username = input.getText().toString().trim();
                 saveToFirebase(username, score);
             });
-
             builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             builder.show();
         });
