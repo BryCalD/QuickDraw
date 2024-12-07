@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
     long score;
     int countdownDuration;
     long shakeTime;
-    long gameStartTime = 0; // Stores the time when the "Go!" signal is displayed
+    long gameStartTime = 0;
     private DatabaseReference mDatabase;
 
     // MediaPlayer for background music
@@ -97,13 +97,12 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
         //background music
         if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(this, R.raw.cowboy_standoff); // Replace with your file name
+            mediaPlayer = MediaPlayer.create(this, R.raw.cowboy_standoff);
             mediaPlayer.start();
         }
     }
 
     private void startGame() {
-        //root layouts
         View backgroundView = findViewById(R.id.main_background);
         Button startButton = findViewById(R.id.startButton);
         Button leaderboardButton = findViewById(R.id.leaderboardButton);
@@ -136,9 +135,8 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
                     countdownTV.setText("Go!");
                     gameStartTime = System.currentTimeMillis();
                     backgroundView.setBackgroundColor(ContextCompat.getColor(MainActivity.this, android.R.color.holo_green_light));
-                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.its_high_noon); // Replace with the new file name
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.its_high_noon);
                     mediaPlayer.start();
-
                     //show the Start Game and Leaderboard buttons again after the game starts
                     startButton.setVisibility(View.VISIBLE);
                     leaderboardButton.setVisibility(View.VISIBLE);
@@ -157,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
                 if (isGameRunning && gameStartTime == 0) {          //   is invalid and forces restart
                     isGameRunning = false;                          //2. If game is started, counts the
                     resultTV.setText("Too Early!!! Try again...."); //   score and gives result
-                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.revolver); // Replace with the new file name
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.revolver);
                     mediaPlayer.start();
                 } else if (isGameRunning) {
                     isGameRunning = false;
@@ -166,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
                     score = shakeTime - gameStartTime;
 
                     // Play a sound when the condition is met and show points
-                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.revolver); // Replace with the new file name
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.revolver);
                     mediaPlayer.start();
                     resultTV.setText("Ya wrangled up " + score + " points!");
                     showUsername(score);
@@ -195,8 +193,9 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
             builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             builder.show();
         });
-    }
 
+    }
+    // ------------firebase saving method-------------
     private void saveToFirebase(String username, long score) {
         String userId = mDatabase.push().getKey();
         if (userId != null) {
@@ -211,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
         }
     }
 
-    // Bluetooth connection
+    // ------------Bluetooth-----------------
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder iBinder) {
@@ -227,14 +226,4 @@ public class MainActivity extends AppCompatActivity implements com.example.ubico
             mBound = false;
         }
     };
-
-    // Release MediaPlayer resources when the activity is destroyed
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    }
 }
